@@ -1,11 +1,7 @@
-/*
-Challenge 1:
+import express from 'express'
+import { getGenres, getProducts } from '../controllers/productsControllers.js'
 
-  - Use express.Router() to export a router called productsRouter
+export const productsRouter = express.Router()
 
-   It should mount the '/api/products' and '/api/products/genres' routes.
-   These should use the two functions from productsControllers.js: getProducts() and getGenres().
-   Be careful here - what is the common pitfall?
-
-   hint.md for help!
-*/
+productsRouter.get('/genres', getGenres)
+productsRouter.get('/', getProducts)
