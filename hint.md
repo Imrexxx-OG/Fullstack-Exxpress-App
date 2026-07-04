@@ -1,3 +1,46 @@
-- You will need to set up an instance of express.Router().
-- Call the get() method on it and pass in a route and a function to call.
-- Watch out for the pitfall where the routes specified in server.js and productRouter.js overlap!
+- Destructure 'search' from req.query
+
+- Use conditional logic to see if 'search' is a truthy value. If it is:
+   - Add to the query let with something like this:
+        query += ' WHERE abc LIKE ? OR xyz LIKE ? ...'
+	- Wrap the search pattern (i.e. inputted search text) in the '%' wildcard to match any sequence of characters.
+	- Push the search pattern to the params array as many times as you have placeholders.
+
+
+Scroll down for spoiler:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+query += ' WHERE name LIKE ? OR address LIKE ? OR town LIKE ?'
+const searchPattern = `%${search}%`
+params.push(searchPattern, searchPattern, searchPattern)
+
+
+
+
+
+
+
