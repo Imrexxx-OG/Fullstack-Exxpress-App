@@ -1,46 +1,5 @@
-- Destructure 'search' from req.query
-
-- Use conditional logic to see if 'search' is a truthy value. If it is:
-   - Add to the query let with something like this:
-        query += ' WHERE abc LIKE ? OR xyz LIKE ? ...'
-	- Wrap the search pattern (i.e. inputted search text) in the '%' wildcard to match any sequence of characters.
-	- Push the search pattern to the params array as many times as you have placeholders.
-
-
-Scroll down for spoiler:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-query += ' WHERE name LIKE ? OR address LIKE ? OR town LIKE ?'
-const searchPattern = `%${search}%`
-params.push(searchPattern, searchPattern, searchPattern)
-
-
-
-
-
-
-
+The bcryptjs package gives us the .compare() method which returns a boolean: 
+    bcrypt.compare(user inputted password, password hash from db) 
+  
+We cannot use lastID here, as that comes from a newly created user. But we can get the user’s ID from the DB. So, assuming we save the user we have extracted from the db to a const ‘user’, we would do something like this:
+    req.session.userId = user.id
