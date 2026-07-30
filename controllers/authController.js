@@ -109,3 +109,13 @@ hint.md for help.
   }
 }
 
+export function logsOutUser(req, res) {
+
+    req.session.destroy(() => {
+        res.json({
+            message: 'Logged out'
+        })
+    })
+
+}
+
