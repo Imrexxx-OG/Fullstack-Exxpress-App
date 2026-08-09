@@ -26,20 +26,10 @@ export async function addToCart(req, res) {
 export async function getCartCount(req, res) {
   const db = await getDBConnection();
   
-/*
-Challenge:
+   const userId = req.session.userId
 
-1. Write code to ensure that when a logged-in user clicks 'Add to Cart', their current cart count is shown in the header with a cart icon. The frontend has been done for you. All the backend need do is provide the following JSON on the /api/cart/cart-count endpoint: 
-{ <THE TOTAL NUMBER OF THE USER'S ITEMS> || 0 }
+   const cartCount = await db.get(`SELECT SUM(quantity) AS totalItems FROM cart_items WHERE user_id = ?`, [userId])
 
-Ignore frontend console errors for now!
- 
-For testing, log in with:
-Username: test
-Password: test
-
-Loads of help in hint.md
-*/
-  
+   res.json({ totalitems: cartCount.totalItems || 0 })
 
 }  
