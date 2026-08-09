@@ -57,51 +57,34 @@ export async function registerUser(req, res) {
 }
 
 export async function loginUser(req, res) {
-/*
-Challenge:
 
- 1. If the user's login details are incomplete, end the response with this JSON and a suitable code:
-    { error: 'All fields are required' } 
+  let { username, password } = req.body
 
- 2. If the user's login details are invalid, end the response with this JSON and a suitable code:
-    { error: 'Invalid credentials'}. This could be because the user does not exist OR because the password does not match the username.
+  if (!username || !password) {
+    return res.status(400).json({ error: 'All fields are required' } )
+  }
 
- 3. If the user’s login details are valid, create a session for the user and end the response with this JSON:
-    { message: 'Logged in' }
-
-Look at .registerUser() above. Is there anything else you need to do?
-
-Important: lastID is not available to us here, so how can we get the user’s ID to attach it to the session?
-
-You can test it by signing in with the following:
-username: test
-password: test
-
-hint.md for help.
-*/
-
+  username = username.trim()
 
   try {
     const db = await getDBConnection()
 
-    let { username, password } = req.body
+    const user = await db.get('SELECT * FROM users WHERE username = ?', [username])
 
-    if(!username || !password){
-      return res.status(400).json( { error: 'All fields are required' } )
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials'})
     }
 
-    username = username.trim()
-    password = password.trim()
-  
+    const isValid = await bcrypt.compare(password, user.password)
 
-    const user = await db.get(`SELECT * FROM users WHERE username = ?`, [username])
-    if(!user || !(await bcrypt.compare(password, user.password)) ){
-      return res.status(401).json( { error: 'Invalid credentials' } )
+    if (!isValid) {
+
+      return res.status(401).json({ error: 'Invalid credentials'})
+
     }
 
     req.session.userId = user.id
-    return res.status(200).json( { message: 'Logged in' } )
-  
+    res.json({ message: 'Logged in' })
 
   } catch (err) {
     console.error('Login error:', err.message)
@@ -109,13 +92,13 @@ hint.md for help.
   }
 }
 
-export function logsOutUser(req, res) {
 
-    req.session.destroy(() => {
-        res.json({
-            message: 'Logged out'
-        })
-    })
+export async function logoutUser(req, res) {
+
+  req.session.destroy( () => {
+
+    res.json({ message: 'Logged out' })
+
+  })
 
 }
-

@@ -3,9 +3,11 @@ import { getDBConnection } from './db/db.js'
 async function logTable() {
   const db = await getDBConnection()
 
-  const tableName = 'users'
+  const tableName = 'cart_items'
+  // const tableName = 'products'
+  // const tableName = 'users'
 
-  try { 
+  try {
     const table = await db.all(`SELECT * FROM ${tableName}`)
     console.table(table)
 

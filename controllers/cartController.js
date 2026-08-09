@@ -3,37 +3,43 @@ import { getDBConnection } from '../db/db.js'
 export async function addToCart(req, res) {
  const db = await getDBConnection()
 
- const product = parseInt(req.body.productId)
- const user = req.session.userId
+ const productId = parseInt(req.body.productId, 10)
 
- if(!user){
-  return res.status(401).json({error: "please log in to manage your data"})
+ if (isNaN(productId)) {
+  return res.status(400).json({ error: 'Invalid product ID'})
  }
 
- const cartItem = await db.get(`SELECT * FROM cart_items WHERE user_id = ? AND product_id = ?`,[user, product])
+ const userId = req.session.userId
 
- if(cartItem){
-    await db.run(`UPDATE cart_items SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ? `, [user, product])
+ const existing = await db.get('SELECT * FROM cart_items WHERE user_id = ? AND product_id = ?', [userId, productId])
+
+ if (existing) {
+  await db.run('UPDATE cart_items SET quantity = quantity + 1 WHERE id = ?', [existing.id])
  } else {
-  await db.run(`INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?) `, [user, product, 1])
+  await db.run('INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, 1)', [userId, productId])
  }
 
  res.json({ message: 'Added to cart' })
 
+}
+
+export async function getCartCount(req, res) {
+  const db = await getDBConnection();
+  
 /*
 Challenge:
 
-1. Write code to ensure that when a logged-in user clicks 'Add to Cart', the product is either added to their cart or its quantity increased if it’s already there, storing the data in the cart_items table. If successful, send the frontend this JSON: { message: 'Added to cart' }.
+1. Write code to ensure that when a logged-in user clicks 'Add to Cart', their current cart count is shown in the header with a cart icon. The frontend has been done for you. All the backend need do is provide the following JSON on the /api/cart/cart-count endpoint: 
+{ <THE TOTAL NUMBER OF THE USER'S ITEMS> || 0 }
 
 Ignore frontend console errors for now!
-
+ 
 For testing, log in with:
 Username: test
 Password: test
 
-Use logTable.js to verify success!
-
 Loads of help in hint.md
 */
+  
 
-}
+}  
