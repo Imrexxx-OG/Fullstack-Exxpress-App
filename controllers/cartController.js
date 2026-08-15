@@ -66,8 +66,30 @@ export async function deleteItem(req, res) {
     await db.run('DELETE FROM cart_items WHERE id = ? AND user_id = ?', [itemId, req.session.userId])
 
     res.status(204).send()
-
-
   
 }
+
+export async function deleteAll(req, res) {
+
+  const db = await getDBConnection()
+
+  const productId = parseInt(req.body.productId, 10)
+  const userId = req.session.userId
+
+  if (isNaN(productId)) {
+    return res.status(400).json({ error: 'Invalid product ID' })
+  }
+
+  await db.run(
+    `DELETE FROM cart_items WHERE user_id = ? AND product_id = ?`,
+    [userId, productId]
+  )
+
+  res.json({ message: 'All cart items have been deleted' })
+}
+  
+  // SELECT  → db.get() / db.all()
+  // INSERT  → db.run()
+  // UPDATE  → db.run()
+  // DELETE  → db.run()
 
