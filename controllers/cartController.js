@@ -41,18 +41,33 @@ export async function getAll(req, res) {
 
   const db = await getDBConnection()
 
-  const cartItems = await db.all(`SELECT 
-                                          cart_items.id AS cartItemId,
-                                          cart_items.quantity,
-                                          products.title,
-                                          products.artist,
-                                          products.price
-                                      FROM cart_items
-                                      JOIN products ON cart_items.product_id = products.id
-                                      WHERE cart_items.user_id = ?
+  const items = await db.all(`SELECT ci.id AS cartItemId, ci.quantity, p.title, p.artist, p.price FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.user_id = ?`, [req.session.userId])
 
-                                          `, [req.session.userId])
-
-   res.json({ items: cartItems })
-
+  res.json({ items: items})
 } 
+
+
+export async function deleteItem(req, res) {
+
+    const db = await getDBConnection()
+
+    const itemId = parseInt(req.params.itemId, 10)
+
+    if (isNaN(itemId)) {
+      return res.status(400).json({error: 'Invalid item ID'})
+    }
+
+    const item = await db.get('SELECT quantity FROM cart_items WHERE id = ? AND user_id = ?', [itemId, req.session.userId])
+
+    if (!item) {
+      return res.status(400).json({error: 'Item not found'})
+    }
+
+    await db.run('DELETE FROM cart_items WHERE id = ? AND user_id = ?', [itemId, req.session.userId])
+
+    res.status(204).send()
+
+
+  
+}
+
