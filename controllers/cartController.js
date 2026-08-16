@@ -34,17 +34,12 @@ export async function getCartCount(req, res) {
 
 export async function getAll(req, res) {
 
-// Don't touch this code!
-  if (!req.session.userId) {
-    return res.json({err: 'not logged in'})
-  }
-
   const db = await getDBConnection()
 
-  const items = await db.all(`SELECT ci.id AS cartItemId, ci.quantity, p.title, p.artist, p.price FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.user_id = ?`, [req.session.userId])
+  const items = await db.all(`SELECT ci.id AS cartItemId, ci.quantity, p.title, p.artist, p.price FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.user_id = ?`, [req.session.userId]) 
 
   res.json({ items: items})
-} 
+}  
 
 
 export async function deleteItem(req, res) {
@@ -73,22 +68,14 @@ export async function deleteAll(req, res) {
 
   const db = await getDBConnection()
 
-  const productId = parseInt(req.body.productId, 10)
-  const userId = req.session.userId
+  await db.run('DELETE FROM cart_items WHERE user_id = ?', [req.session.userId])
 
-  if (isNaN(productId)) {
-    return res.status(400).json({ error: 'Invalid product ID' })
-  }
-
-  await db.run(
-    `DELETE FROM cart_items WHERE user_id = ? AND product_id = ?`,
-    [userId, productId]
-  )
-
-  res.json({ message: 'All cart items have been deleted' })
-}
+  res.status(204).send()
   
-  // SELECT  → db.get() / db.all()
+}
+
+
+// SELECT  → db.get() / db.all()
   // INSERT  → db.run()
   // UPDATE  → db.run()
   // DELETE  → db.run()

@@ -42,13 +42,12 @@ export async function registerUser(req, res) {
     const hashed = await bcrypt.hash(password, 10)
 
     const result = await db.run('INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)', [name, email, username, hashed])
-    console.log(result)
 
     req.session.userId = result.lastID
 
     res.status(201).json({ message: 'User registered' })
   } catch (err) {
-
+ 
     console.error('Registration error:', err.message);
     res.status(500).json({ error: 'Registration failed. Please try again.' })
 
