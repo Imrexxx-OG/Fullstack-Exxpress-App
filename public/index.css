@@ -2,18 +2,22 @@
    CSS Variables
 ----------------------------------- */
 :root {
-    /* Colors */
-    --color-bg: #121212;
-    --color-bg-light: #1A1A1A;
+    /* Colors — a record shop at night: matte black vinyl,
+       a neon label pink, and a warm turntable-gold for accents */
+    --color-bg: #101012;
+    --color-bg-light: #18181b;
+    --color-bg-lightest: #232327;
     --color-accent: #ff4c7b;
-    --color-text: #E0E0E0;
-    --color-input-bg: #666;
-    --color-placeholder: whitesmoke;
-    --color-bg-lightest: #333;
+    --color-accent-warm: #e8b84b;
+    --color-text: #ededed;
+    --color-text-dim: #9a9aa2;
+    --color-input-bg: #2a2a2e;
+    --color-placeholder: #8a8a90;
 
     /* Font */
-    --font-base: 'Poppins';
+    --font-base: 'Poppins', sans-serif;
     --font-heading: 'Plaster', sans-serif;
+    --font-mono: 'Space Mono', monospace;
 
     /* Spacing */
     --space-xs: 0.3rem;
@@ -25,6 +29,9 @@
     --radius-sm: 3px;
     --radius-md: 4px;
     --radius-lg: 8px;
+
+    /* Motion */
+    --ease-snap: cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
 /* -----------------------------------
@@ -44,6 +51,16 @@ body {
     font-family: var(--font-base);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 /* -----------------------------------
    Typography
 ----------------------------------- */
@@ -55,6 +72,7 @@ h1 {
     text-align: center;
     margin: 0;
     text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
 h2 {
@@ -67,7 +85,11 @@ h3 {
 }
 
 .subhead {
-    font-size: clamp(1rem, 2.5vw, 2rem);
+    font-family: var(--font-mono);
+    font-size: clamp(0.75rem, 2vw, 1.1rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
     margin: 0;
 }
 
@@ -95,19 +117,35 @@ footer {
 
 header {
     justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    background-image:
+        repeating-radial-gradient(
+            circle at 88% 50%,
+            rgba(255, 76, 123, 0.05) 0px,
+            rgba(255, 76, 123, 0.05) 1px,
+            transparent 1px,
+            transparent 10px
+        );
 }
 
 header img {
     width: clamp(80px, 15vw, 200px);
+    position: relative;
+    z-index: 1;
 }
 
 footer {
     justify-content: center;
     margin-top: var(--space-lg);
+    color: var(--color-text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
 }
 
 .products {
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-md) var(--space-lg);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(0, 250px));
     grid-auto-rows: 1fr;
@@ -123,6 +161,10 @@ footer {
     padding: var(--space-lg);
     gap: var(--space-md);
     margin-bottom: 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* -----------------------------------
@@ -135,21 +177,28 @@ footer {
     gap: 1em;
     padding: var(--space-sm) var(--space-md);
     background-color: var(--color-bg-lightest);
+    border-bottom: 1px solid rgba(255, 76, 123, 0.25);
     position: relative;
 }
 
 .top-banner input {
     margin-left: var(--space-md);
-    padding: var(--space-sm);
-    border: none;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid transparent;
     border-radius: var(--radius-md);
     background-color: var(--color-input-bg);
     color: white;
+    font-family: var(--font-base);
+    transition: border-color 0.2s var(--ease-snap);
 }
 
 .top-banner input::placeholder {
     color: var(--color-placeholder);
     transition: color 0.2s ease;
+}
+
+.top-banner input:focus {
+    border-color: var(--color-accent);
 }
 
 .top-banner input:focus::placeholder {
@@ -160,6 +209,7 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    gap: var(--space-xs);
 }
 
 .header-menu {
@@ -188,12 +238,75 @@ footer {
     justify-content: space-between;
     width: 100%;
     max-width: 250px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
+    transition: transform 0.25s var(--ease-snap), box-shadow 0.25s var(--ease-snap);
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 76, 123, 0.3);
+}
+
+/* Signature: the record slides out from behind its sleeve on hover */
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    width: 88%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at center, var(--color-bg-light) 0 6%, transparent 6.5%),
+        repeating-radial-gradient(circle at center, #050505 0px, #050505 2px, #1c1c1f 2px, #1c1c1f 4px);
+    transform: translate(-50%, 0) scale(0.9);
+    opacity: 0;
+    z-index: 0;
+    transition: transform 0.4s var(--ease-snap), opacity 0.4s var(--ease-snap);
+}
+
+.product-card:hover::before {
+    transform: translate(-15%, -8%) scale(0.9) rotate(25deg);
+    opacity: 1;
 }
 
 .product-card img {
     width: 100%;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: var(--radius-md);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.4s var(--ease-snap);
+}
+
+.product-card:hover img {
+    transform: translateX(-6%);
+}
+
+.product-card > *:not(img) {
+    position: relative;
+    z-index: 1;
+    padding: 0 var(--space-sm);
+    margin: 0;
+}
+
+.product-card > h2 {
+    margin-top: var(--space-sm);
+    font-size: 1rem;
+}
+
+.product-card > h3 {
+    font-weight: 400;
+    color: var(--color-text-dim);
+}
+
+.product-card > p:not(.genre-label) {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--color-accent-warm);
+    font-size: 1rem;
 }
 
 .add-btn {
@@ -203,19 +316,43 @@ footer {
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-family: var(--font-base);
+    font-weight: 600;
+    transition: background-color 0.2s var(--ease-snap), transform 0.15s var(--ease-snap), box-shadow 0.2s var(--ease-snap);
 }
 
-.genre-label {
+.product-card > .add-btn {
+    margin-top: var(--space-xs);
+}
+
+.add-btn:hover {
+    background-color: #ff6d92;
+    box-shadow: 0 4px 14px rgba(255, 76, 123, 0.35);
+}
+
+.add-btn:active {
+    background-color: var(--color-accent-warm);
+    color: #1a1a1a;
+    box-shadow: none;
+}
+
+/* Scoped to .product-card so it wins specificity over the
+   ".product-card > *:not(img)" rule above and keeps its pinned corner */
+.product-card > .genre-label {
     position: absolute;
     top: 0;
     left: 0;
     margin-top: 0;
     padding: 0.2rem 0.5rem;
-    background-color: var(--color-accent);
-    color: black;
+    background-color: var(--color-accent-warm);
+    color: #1a1a1a;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     border-bottom-right-radius: var(--radius-md);
     border-top-left-radius: var(--radius-md);
+    z-index: 2;
 }
 
 /* -----------------------------------
@@ -226,27 +363,29 @@ section label {
 }
 
 select {
-    padding: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
     background-color: var(--color-bg-lightest);
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-sm);
     cursor: pointer;
+    font-family: var(--font-mono);
 }
 
 /* -----------------------------------
    Accessibility
 ----------------------------------- */
 
-a:focus,
-button:focus,
-input:focus,
-select:focus {
-    outline: 2px solid var(--color-accent);
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--color-accent-warm);
     outline-offset: 2px;
 }
 
 button:active {
-  transform: scale(0.9);
+  transform: scale(0.94);
 }
 
 .visually-hidden {
@@ -276,7 +415,7 @@ button:active {
         right: 0;
         z-index: 1;
         border-left: 2px solid var(--color-accent);
-        min-height: 100vh; 
+        min-height: 100vh;
         gap: 1em;
     }
 
@@ -291,6 +430,11 @@ button:active {
         background-color: transparent;
         border: none;
         color: white;
+        transition: color 0.2s var(--ease-snap);
+    }
+
+    .menu-toggle:hover {
+        color: var(--color-accent);
     }
 
     .top-banner input {
